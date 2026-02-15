@@ -36,7 +36,7 @@ public class UserContext(DbContextOptions opt) : DbContext(opt)
         modelBuilder.Entity<Order>()
             .HasOne(o => o.User)                 // Each Order has 1 User
             .WithMany()                          // User has no navigation to Orders (unidirectional)
-            .HasForeignKey("UserId")             // Order carries FK
+            // .HasForeignKey("UserId")          // Optional for 1:n (EF knows), but names the shadow FK explicitly
             .OnDelete(DeleteBehavior.Cascade);   // Deleting User deletes Orders.
     }
 }
