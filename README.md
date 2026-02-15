@@ -2,12 +2,13 @@
 
 ## EF Core Conventions
 
-- **Table Name**: `DbSet<User> Users` -> table named `Users`
-- **Primary Key**: Property named `Id` or `<Type>Id` is automatically the PK
-- **Foreign Key**: Shadow FK (DB column without C# property)
+- **Table Name**: EF Core uses `DbSet<User> Users` -> table named `Users`
+- **Primary Key**: EF Core uses property named `Id` or `<Type>Id` as PK
+- **Foreign Key**: EF Core creates Shadow FK (DB column without C# property)
   - Name derived from navigation property (`User` -> `UserId`) or from type `<Type>Id`
-  - **1:1**: fluent API needed, otherwise 1:n is configured by convention
-  - **1:n**: no fluent API needed, configures 1:n by convention
+- **Relationships**:
+  - **1:1**: Fluent API needed, otherwise EF Core configures 1:n by convention
+  - **1:n**: Fluent API not needed, EF Core configures 1:n by convention
 
 ## 1:1 Unidirektional (User -> Profile)
 
