@@ -15,6 +15,8 @@ namespace OneToManyBi.Infrastructure;
  *     UserId      INTEGER NOT NULL,
  *     FOREIGN KEY (UserId) REFERENCES Users (Id) ON DELETE CASCADE
  * );
+ *
+ * CREATE INDEX IX_Orders_UserId ON Orders (UserId);
  */
 
 public class UserContext(DbContextOptions opt) : DbContext(opt)

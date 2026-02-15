@@ -2,14 +2,16 @@
 
 ## EF Core Conventions
 
-- **Primary Key**: Property named `Id` or `<Type>Id` is automatically the PK
-- **Foreign Key**: Navigation properties auto-generate a shadow FK (`UserId`)
 - **Table Name**: `DbSet<User> Users` -> table named `Users`
+- **Primary Key**: Property named `Id` or `<Type>Id` is automatically the PK
+- **Foreign Key**: Shadow FK (DB column without C# property)
+  - Name derived from navigation property (`User` -> `UserId`) or from type `<Type>Id`
+  - **1:1**: fluent API needed, otherwise 1:n is configured by convention
+  - **1:n**: no fluent API needed, configures 1:n by convention
 
 ## 1:1 Unidirektional (User -> Profile)
 
 ```csharp
-// HasForeignKey<T> is required for 1:1 — EF can't determine which side carries the FK.
 modelBuilder.Entity<User>()
     .HasOne(u => u.Profile)
     .WithOne()
@@ -20,7 +22,6 @@ modelBuilder.Entity<User>()
 ## 1:1 Bidirektional (User <-> Passport)
 
 ```csharp
-// HasForeignKey<T> is required for 1:1 — EF can't determine which side carries the FK.
 modelBuilder.Entity<User>()
     .HasOne(u => u.Passport)
     .WithOne(p => p.User)
@@ -31,22 +32,22 @@ modelBuilder.Entity<User>()
 ## 1:n Unidirektional (Order -> User)
 
 ```csharp
-// HasForeignKey is optional for 1:n — EF knows the FK goes on the "many" side.
+// EF Core auto-configures 1:n, but we can still manually do it
 modelBuilder.Entity<Order>()
     .HasOne(o => o.User)
     .WithMany()
-    //.HasForeignKey("UserId")
+    .HasForeignKey("UserId")
     .OnDelete(DeleteBehavior.Cascade);
 ```
 
 ## 1:n Bidirektional (User <-> Orders)
 
 ```csharp
-// HasForeignKey is optional for 1:n — EF knows the FK goes on the "many" side.
+// EF Core auto-configures 1:n, but we can still manually do it
 modelBuilder.Entity<User>()
     .HasMany(u => u.Orders)
     .WithOne(o => o.User)
-    //.HasForeignKey("UserId")
+    .HasForeignKey("UserId")
     .OnDelete(DeleteBehavior.Cascade);
 ```
 
@@ -59,6 +60,7 @@ modelBuilder.Entity<User>()
 // Enum -> string
 order.Property(o => o.Status).HasConversion<string>();
 
+// Enum -> custom value
 order.Property(o => o.Status)
     .HasConversion(
         status => StatusToDb[status],
@@ -75,12 +77,14 @@ order.OwnsOne(o => o.ShippingAddress);
 
 // --- Mappings ---
 
-// Enum -> custom value (Dictionary mapping)
+// Normal Lookup: OrdersStatus -> string
 Dictionary<OrderStatus, string> StatusToDb = new()
 {
     [OrderStatus.Created] = "C",
     [OrderStatus.Paid] = "P"
 };
+
+// Inverse Lookup: string -> OrderStatus
 Dictionary<string, OrderStatus> DbToStatus =
     StatusToDb.ToDictionary(x => x.Value, x => x.Key);
 ```
