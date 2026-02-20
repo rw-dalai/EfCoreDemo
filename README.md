@@ -58,6 +58,8 @@ modelBuilder.Entity<User>()
 
 // --- Configs ---
 
+var order = modelBuilder.Entity<Order>();
+
 // Enum -> string
 order.Property(o => o.Status).HasConversion<string>();
 
@@ -110,4 +112,28 @@ modelBuilder.Entity<PaymentMethod>()
     .HasDiscriminator<string>("PaymentType")
     .HasValue<CreditCard>("CreditCard")
     .HasValue<PayPal>("PayPal");
+```
+
+
+## Configure Sqlite for Tests
+
+```csharp
+ private UserContext GetDatabase()
+{
+    // Create in-memory SQLite database
+    var connection = new SqliteConnection("DataSource=:memory:");
+    connection.Open();
+
+    var opt = new DbContextOptionsBuilder<UserContext>()
+        .UseSqlite(connection)
+        .LogTo(message => Debug.WriteLine(message), LogLevel.Information)
+        .EnableSensitiveDataLogging()
+        .Options;
+
+    var db = new UserContext(opt);
+    Debug.WriteLine(db.Database.GenerateCreateScript());
+    db.Database.EnsureDeleted();
+    db.Database.EnsureCreated();
+    return db;
+}
 ```
