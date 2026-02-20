@@ -10,7 +10,7 @@
   - **1:1**: Fluent API needed, otherwise EF Core configures 1:n by convention
   - **1:n**: Fluent API not needed, EF Core configures 1:n by convention
 
-## Table and Column Names
+## Custom Table and Column Names
 ```csharp
 
 modelBuilder.Entity<User>()
