@@ -10,6 +10,22 @@
   - **1:1**: Fluent API needed, otherwise EF Core configures 1:n by convention
   - **1:n**: Fluent API not needed, EF Core configures 1:n by convention
 
+## Table and Column Names
+```csharp
+
+modelBuilder.Entity<User>()
+    .ToTable("User")
+    .Property(u => u.Name)
+    .HasColumnName("FullName");
+```
+
+## Custom Primary Key
+
+```csharp
+modelBuilder.Entity<Product>()
+    .HasKey(p => p.ArticleNumber);
+```
+
 ## 1:1 Unidirektional (User -> Profile)
 
 ```csharp
@@ -95,9 +111,6 @@ Dictionary<string, OrderStatus> DbToStatus =
 ## Indexes
 
 ```csharp
-// Natural key als Primary Key
-product.HasKey(p => p.ArticleNumber);
-
 // NON-UNIQUE index
 product.HasIndex(p => p.Category);
 
